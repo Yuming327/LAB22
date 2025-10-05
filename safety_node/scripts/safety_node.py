@@ -44,19 +44,19 @@ class SafetyNode(Node):
         self.speed = odom_msg.twist.twist.linear.x
 
     def scan_callback(self, scan_msg):
-    ranges = np.array(scan_msg.ranges)
-    angles = np.arange(scan_msg.angle_min,
-                       scan_msg.angle_max,
-                       scan_msg.angle_increment)
-    v_proj = self.speed * np.cos(angles)
-    ttc = ranges / np.maximum(v_proj, 1e-6)
-    min_ttc = np.min(ttc)
+        ranges = np.array(scan_msg.ranges)
+        angles = np.arange(scan_msg.angle_min,
+                           scan_msg.angle_max,
+                           scan_msg.angle_increment)
+        v_proj = self.speed * np.cos(angles)
+        ttc = ranges / np.maximum(v_proj, 1e-6)
+        min_ttc = np.min(ttc)
     
-    if min_ttc < 1.0:
-        drive_msg = AckermannDriveStamped()
-        drive_msg.drive.speed = 0.0
-        self.drive_pub.publish(drive_msg)
-        self.get_logger().info("⚠️ Emergency brake! TTC: {:.2f}s".format(min_ttc))
+        if min_ttc < 1.0:
+            drive_msg = AckermannDriveStamped()
+            drive_msg.drive.speed = 0.0
+            self.drive_pub.publish(drive_msg)
+            self.get_logger().info("⚠️ Emergency brake! TTC: {:.2f}s".format(min_ttc))
 
 
 def main(args=None):
